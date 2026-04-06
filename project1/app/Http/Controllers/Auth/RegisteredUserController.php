@@ -32,14 +32,23 @@ class RegisteredUserController extends Controller
     {
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'foto' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif', 'max:2048'], 
         ]);
+
+        // Proses upload foto jika ada
+        $fotoPath = null;
+        if ($request->hasFile('foto')) {
+            // Ini akan menyimpan file di folder storage/app/public/profile_photos
+            $fotoPath = $request->file('foto')->store('profile_photos', 'public');
+        }
 
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'foto' => $fotoPath, // Simpan path gambar ke database
         ]);
 
         event(new Registered($user));

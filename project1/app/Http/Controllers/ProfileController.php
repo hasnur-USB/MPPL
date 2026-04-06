@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
+use Illuminate\Support\Facades\Storage;
 
 class ProfileController extends Controller
 {
@@ -30,6 +31,17 @@ class ProfileController extends Controller
 
         if ($request->user()->isDirty('email')) {
             $request->user()->email_verified_at = null;
+        }
+
+        // bnaris untuk update foto
+        if ($request->hasFile('foto')) {
+            // Baris untuk Hapus foto lama jika ada di storage
+            if ($request->user()->foto && Storage::disk('public')->exists($request->user()->foto)) {
+                Storage::disk('public')->delete($request->user()->foto);
+            }
+            // Baris Simpan foto baru
+            $fotoPath = $request->file('foto')->store('profile_photos', 'public');
+            $request->user()->foto = $fotoPath;
         }
 
         $request->user()->save();
