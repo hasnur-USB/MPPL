@@ -14,6 +14,7 @@
                         request()->routeIs('katalog.index')">
                         {{ __('Dashboard') }}
                     </x-nav-link>
+
                     @if (Auth::user()->role === 'admin')
                         <x-nav-link :href="route('admin.barang.index')" :active="request()->routeIs('admin.barang.*')">
                             {{ __('Kelola Barang') }}
@@ -27,10 +28,13 @@
                     @if (Auth::user()->role === 'customer')
                         <x-nav-link :href="route('cart.index')" :active="request()->routeIs('cart.index')">
                             {{ __('Keranjang') }}
-                            @if (session('cart'))
+                            @php
+                                $cartCount = \App\Models\Cart::where('user_id', Auth::id())->sum('qty');
+                            @endphp
+                            @if ($cartCount > 0)
                                 <span
                                     class="ms-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                                    {{ count(session('cart')) }}
+                                    {{ $cartCount }}
                                 </span>
                             @endif
                         </x-nav-link>
@@ -42,6 +46,7 @@
                 </div>
             </div>
 
+            <!-- User Dropdown -->
             <div class="hidden sm:flex sm:items-center sm:ms-6">
                 <x-dropdown align="right" width="48">
                     <x-slot name="trigger">
@@ -58,9 +63,7 @@
                                     </div>
                                 @endif
                             </div>
-
                             <div>{{ Auth::user()->name }} ({{ ucfirst(Auth::user()->role) }})</div>
-
                             <div class="ms-1">
                                 <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg"
                                     viewBox="0 0 20 20">
@@ -80,8 +83,7 @@
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
                             <x-dropdown-link :href="route('logout')"
-                                onclick="event.preventDefault();
-                                                this.closest('form').submit();">
+                                onclick="event.preventDefault(); this.closest('form').submit();">
                                 {{ __('Log Out') }}
                             </x-dropdown-link>
                         </form>
@@ -89,6 +91,7 @@
                 </x-dropdown>
             </div>
 
+            <!-- Mobile Menu Button -->
             <div class="-me-2 flex items-center sm:hidden">
                 <button @click="open = ! open"
                     class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 dark:text-gray-500 hover:text-gray-500 dark:hover:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-900 focus:outline-none focus:bg-gray-100 dark:focus:bg-gray-900 focus:text-gray-500 dark:focus:text-gray-400 transition duration-150 ease-in-out">
@@ -104,6 +107,7 @@
         </div>
     </div>
 
+    <!-- Mobile Menu -->
     <div :class="{ 'block': open, 'hidden': !open }" class="hidden sm:hidden">
         <div class="pt-2 pb-3 space-y-1">
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard') ||
@@ -124,30 +128,22 @@
 
             @if (Auth::user()->role === 'customer')
                 <x-responsive-nav-link :href="route('cart.index')" :active="request()->routeIs('cart.index')">
-                    {{ __('Keranjang') }} ({{ session('cart') ? count(session('cart')) : 0 }})
+                    {{ __('Keranjang') }}
+                    @php
+                        $cartCount = \App\Models\Cart::where('user_id', Auth::id())->sum('qty');
+                    @endphp
+                    @if ($cartCount > 0)
+                        <span
+                            class="ms-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                            {{ $cartCount }}
+                        </span>
+                    @endif
+                </x-responsive-nav-link>
+
+                <x-responsive-nav-link :href="route('riwayat.index')" :active="request()->routeIs('riwayat.index')">
+                    {{ __('Riwayat Belanja') }}
                 </x-responsive-nav-link>
             @endif
-        </div>
-
-        <div class="pt-4 pb-1 border-t border-gray-200 dark:border-gray-600">
-            <div class="px-4 flex items-center gap-3">
-                <div class="shrink-0">
-                    @if (Auth::user()->profile_photo)
-                        <img src="{{ asset('storage/' . Auth::user()->profile_photo) }}"
-                            class="h-10 w-10 rounded-full object-cover">
-                    @else
-                        <div
-                            class="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold">
-                            {{ substr(Auth::user()->name, 0, 1) }}
-                        </div>
-                    @endif
-                </div>
-
-                <div>
-                    <div class="font-medium text-base text-gray-800 dark:text-gray-200">{{ Auth::user()->name }}</div>
-                    <div class="font-medium text-sm text-gray-500">{{ Auth::user()->email }}</div>
-                </div>
-            </div>
         </div>
     </div>
 </nav>
