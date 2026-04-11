@@ -7,60 +7,94 @@
 
     <div class="py-12">
         <div class="max-w-3xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
 
-                <form action="{{ route('admin.barang.update', $barang->id) }}" method="POST" enctype="multipart/form-data">
+                <form action="{{ route('admin.barang.update', $barang->id) }}" method="POST"
+                    enctype="multipart/form-data">
                     @csrf
                     @method('PUT')
 
-                    <div class="mb-4">
-                        <label class="block text-gray-700 text-sm font-bold mb-2">Nama Barang</label>
-                        <input type="text" name="nama_barang"
-                            class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm w-full"
-                            value="{{ old('nama_barang', $barang->nama_barang) }}" required>
-                    </div>
+                    <div class="p-6 space-y-6">
 
-                    <div class="mb-4">
-                        <label class="block text-gray-700 text-sm font-bold mb-2">Deskripsi</label>
-                        <textarea name="deskripsi" rows="4"
-                            class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm w-full">{{ old('deskripsi', $barang->deskripsi) }}</textarea>
-                    </div>
+                        <!-- Nama Barang -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Nama Barang</label>
+                            <input type="text" name="nama_barang"
+                                value="{{ old('nama_barang', $barang->nama_barang) }}"
+                                class="w-full border-gray-300 rounded-lg focus:border-blue-500 focus:ring-blue-500"
+                                required>
+                            @error('nama_barang')
+                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
 
-                    <div class="mb-4 border p-4 rounded bg-gray-50">
-                        <label class="block text-gray-700 text-sm font-bold mb-2">Gambar Produk</label>
-                        
-                        @if($barang->gambar)
-                            <div class="mb-3">
-                                <p class="text-sm text-gray-600 mb-1">Gambar saat ini:</p>
-                                <img src="{{ asset('storage/' . $barang->gambar) }}" alt="Gambar Lama" class="h-32 w-32 object-cover rounded shadow">
+                        <!-- Deskripsi -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Deskripsi</label>
+                            <textarea name="deskripsi" rows="4"
+                                class="w-full border-gray-300 rounded-lg focus:border-blue-500 focus:ring-blue-500">{{ old('deskripsi', $barang->deskripsi) }}</textarea>
+                            @error('deskripsi')
+                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <!-- Gambar -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Gambar Produk</label>
+
+                            @if ($barang->gambar)
+                                <div class="mb-4">
+                                    <p class="text-sm text-gray-600 mb-2">Gambar saat ini:</p>
+                                    <img src="{{ Storage::url($barang->gambar) }}" alt="Gambar Lama"
+                                        class="h-40 w-40 object-cover rounded-xl shadow border border-gray-200">
+                                </div>
+                            @endif
+
+                            <input type="file" name="gambar" accept="image/jpeg,image/png,image/jpg,image/webp"
+                                class="block w-full text-sm text-gray-500 
+                                          file:mr-4 file:py-3 file:px-6 file:rounded-xl file:border-0 
+                                          file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 
+                                          hover:file:bg-blue-100">
+                            <p class="text-xs text-gray-500 mt-2">Biarkan kosong jika tidak ingin mengganti gambar.
+                                Maksimal 2MB.</p>
+                            @error('gambar')
+                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <!-- Harga & Stok -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Harga (Rp)</label>
+                                <input type="number" name="harga" value="{{ old('harga', $barang->harga) }}"
+                                    class="w-full border-gray-300 rounded-lg focus:border-blue-500 focus:ring-blue-500"
+                                    min="0" required>
+                                @error('harga')
+                                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                                @enderror
                             </div>
-                        @endif
 
-                        <input type="file" name="gambar" accept="image/*"
-                            class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm w-full bg-white p-2">
-                        <p class="text-xs text-gray-500 mt-1">Biarkan kosong jika tidak ingin mengganti gambar.</p>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Stok</label>
+                                <input type="number" name="stok" value="{{ old('stok', $barang->stok) }}"
+                                    class="w-full border-gray-300 rounded-lg focus:border-blue-500 focus:ring-blue-500"
+                                    min="0" required>
+                                @error('stok')
+                                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                                @enderror
+                            </div>
+                        </div>
+
                     </div>
 
-                    <div class="grid grid-cols-2 gap-4 mb-6">
-                        <div>
-                            <label class="block text-gray-700 text-sm font-bold mb-2">Harga (Rp)</label>
-                            <input type="number" name="harga"
-                                class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm w-full"
-                                value="{{ old('harga', $barang->harga) }}" required min="0">
-                        </div>
-                        <div>
-                            <label class="block text-gray-700 text-sm font-bold mb-2">Stok</label>
-                            <input type="number" name="stok"
-                                class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm w-full"
-                                value="{{ old('stok', $barang->stok) }}" required min="0">
-                        </div>
-                    </div>
-
-                    <div class="flex items-center justify-end mt-4 gap-3">
+                    <!-- Footer Form -->
+                    <div class="bg-gray-50 px-6 py-4 flex justify-end gap-3 border-t">
                         <a href="{{ route('admin.barang.index') }}"
-                            class="text-gray-600 hover:text-gray-900 underline">Batal</a>
+                            class="px-5 py-2.5 text-gray-600 hover:text-gray-800 font-medium">
+                            Batal
+                        </a>
                         <button type="submit"
-                            class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded">
+                            class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2.5 rounded-xl transition">
                             Update Barang
                         </button>
                     </div>

@@ -14,7 +14,7 @@ return new class extends Migration {
             $table->integer('qty')->default(1);
             $table->timestamps();
 
-            $table->unique(['user_id', 'barang_id']); // agar tidak duplikat barang di cart
+            $table->unique(['user_id', 'barang_id']); 
         });
     }
 

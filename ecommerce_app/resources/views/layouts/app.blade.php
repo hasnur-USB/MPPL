@@ -68,6 +68,7 @@
                 @endif
 
                 @if (Auth::user()->role === 'customer')
+                    <!-- Keranjang -->
                     <x-nav-link-sidebar :href="route('cart.index')" :active="request()->routeIs('cart.index')">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -75,6 +76,23 @@
                             </path>
                         </svg>
                         <span>Keranjang</span>
+                        @php
+                            $cartCount = \App\Models\Cart::where('user_id', Auth::id())->sum('qty');
+                        @endphp
+                        @if ($cartCount > 0)
+                            <span class="ml-auto bg-red-100 text-red-700 text-xs px-2 py-0.5 rounded-full font-medium">
+                                {{ $cartCount }}
+                            </span>
+                        @endif
+                    </x-nav-link-sidebar>
+
+                    <!-- Riwayat Belanja -->
+                    <x-nav-link-sidebar :href="route('riwayat.index')" :active="request()->routeIs('riwayat.index')">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 8v4l3 3m6-3a9 9 0 01-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span>Riwayat Belanja</span>
                     </x-nav-link-sidebar>
                 @endif
             </nav>
