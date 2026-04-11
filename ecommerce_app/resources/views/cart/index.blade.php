@@ -47,18 +47,19 @@
                                         <tr>
                                             <td class="py-6 px-6">
                                                 <div class="flex items-center gap-4">
-                                                    @if ($item->barang->gambar)
+                                                    @if ($item->barang && $item->barang->gambar)
                                                         <img src="{{ $item->barang->gambar }}"
-                                                            alt="{{ $item->barang->nama_barang }}"
+                                                            alt="{{ $item->barang->nama_barang ?? 'Produk' }}"
                                                             class="w-16 h-16 object-cover rounded-lg">
                                                     @endif
                                                     <div>
-                                                        <p class="font-medium">{{ $item->barang->nama_barang }}</p>
+                                                        <p class="font-medium">
+                                                            {{ $item->barang->nama_barang ?? 'Nama Barang' }}</p>
                                                     </div>
                                                 </div>
                                             </td>
                                             <td class="py-6 px-6 text-center">
-                                                Rp {{ number_format($item->barang->harga, 0, ',', '.') }}
+                                                Rp {{ number_format($item->barang->harga ?? 0, 0, ',', '.') }}
                                             </td>
                                             <td class="py-6 px-6">
                                                 <form action="{{ route('cart.update', $item->id) }}" method="POST"
@@ -75,7 +76,8 @@
                                                 </form>
                                             </td>
                                             <td class="py-6 px-6 text-right font-medium">
-                                                Rp {{ number_format($item->qty * $item->barang->harga, 0, ',', '.') }}
+                                                Rp
+                                                {{ number_format(($item->qty ?? 1) * ($item->barang->harga ?? 0), 0, ',', '.') }}
                                             </td>
                                             <td class="py-6 px-6 text-right">
                                                 <form action="{{ route('cart.remove', $item->id) }}" method="POST">
@@ -95,9 +97,10 @@
 
                         <div class="mt-8 border-t pt-8 flex justify-between items-center text-xl font-bold">
                             <span>Total Pembayaran:</span>
-                            <span>Rp {{ number_format($total, 0, ',', '.') }}</span>
+                            <span>Rp {{ number_format($total ?? 0, 0, ',', '.') }}</span>
                         </div>
 
+                        <!-- TOMBOL CHECKOUT YANG SUDAH DIPERBAIKI -->
                         <div class="mt-10 flex justify-end">
                             <form action="{{ route('checkout.store') }}" method="POST">
                                 @csrf
