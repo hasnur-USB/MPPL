@@ -25,8 +25,8 @@
                     @if ($cartItems->isEmpty())
                         <div class="text-center py-16">
                             <p class="text-2xl text-gray-500 mb-6">Keranjang Anda kosong</p>
-                            <a href="{{ route('katalog.index') }}"
-                                class="inline-block bg-blue-600 text-white px-8 py-4 rounded-xl hover:bg-blue-700 transition text-lg">
+                            <a href="{{ route('katalog.index') }}" 
+                               class="inline-block bg-blue-600 text-white px-8 py-4 rounded-xl hover:bg-blue-700 transition text-lg">
                                 🛍️ Mulai Belanja Sekarang
                             </a>
                         </div>
@@ -44,52 +44,47 @@
                                 </thead>
                                 <tbody class="divide-y">
                                     @foreach ($cartItems as $item)
-                                        <tr>
-                                            <td class="py-6 px-6">
-                                                <div class="flex items-center gap-4">
-                                                    @if ($item->barang && $item->barang->gambar)
-                                                        <img src="{{ $item->barang->gambar }}"
-                                                            alt="{{ $item->barang->nama_barang ?? 'Produk' }}"
-                                                            class="w-16 h-16 object-cover rounded-lg">
-                                                    @endif
-                                                    <div>
-                                                        <p class="font-medium">
-                                                            {{ $item->barang->nama_barang ?? 'Nama Barang' }}</p>
-                                                    </div>
+                                    <tr>
+                                        <td class="py-6 px-6">
+                                            <div class="flex items-center gap-4">
+                                                @if ($item->barang && $item->barang->gambar)
+                                                    <img src="{{ $item->barang->gambar }}" 
+                                                         alt="{{ $item->barang->nama_barang ?? 'Produk' }}" 
+                                                         class="w-16 h-16 object-cover rounded-lg">
+                                                @endif
+                                                <div>
+                                                    <p class="font-medium">{{ $item->barang->nama_barang ?? 'Nama Barang' }}</p>
                                                 </div>
-                                            </td>
-                                            <td class="py-6 px-6 text-center">
-                                                Rp {{ number_format($item->barang->harga ?? 0, 0, ',', '.') }}
-                                            </td>
-                                            <td class="py-6 px-6">
-                                                <form action="{{ route('cart.update', $item->id) }}" method="POST"
-                                                    class="flex justify-center items-center gap-3">
-                                                    @csrf
-                                                    @method('PATCH')
-                                                    <input type="number" name="qty" value="{{ $item->qty }}"
-                                                        min="1"
-                                                        class="w-20 text-center border border-gray-300 rounded py-2">
-                                                    <button type="submit"
-                                                        class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm">
-                                                        Update
-                                                    </button>
-                                                </form>
-                                            </td>
-                                            <td class="py-6 px-6 text-right font-medium">
-                                                Rp
-                                                {{ number_format(($item->qty ?? 1) * ($item->barang->harga ?? 0), 0, ',', '.') }}
-                                            </td>
-                                            <td class="py-6 px-6 text-right">
-                                                <form action="{{ route('cart.remove', $item->id) }}" method="POST">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button onclick="return confirm('Hapus barang ini dari keranjang?')"
+                                            </div>
+                                        </td>
+                                        <td class="py-6 px-6 text-center">
+                                            Rp {{ number_format($item->barang->harga ?? 0, 0, ',', '.') }}
+                                        </td>
+                                        <td class="py-6 px-6">
+                                            <form action="{{ route('cart.update', $item->id) }}" method="POST" class="flex justify-center items-center gap-3">
+                                                @csrf
+                                                @method('PATCH')
+                                                <input type="number" name="qty" value="{{ $item->qty }}" 
+                                                       min="1" class="w-20 text-center border border-gray-300 rounded py-2">
+                                                <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm">
+                                                    Update
+                                                </button>
+                                            </form>
+                                        </td>
+                                        <td class="py-6 px-6 text-right font-medium">
+                                            Rp {{ number_format(($item->qty ?? 1) * ($item->barang->harga ?? 0), 0, ',', '.') }}
+                                        </td>
+                                        <td class="py-6 px-6 text-right">
+                                            <form action="{{ route('cart.remove', $item->id) }}" method="POST">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button onclick="return confirm('Hapus barang ini dari keranjang?')" 
                                                         class="text-red-600 hover:text-red-800 font-medium">
-                                                        Hapus
-                                                    </button>
-                                                </form>
-                                            </td>
-                                        </tr>
+                                                    Hapus
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
                                     @endforeach
                                 </tbody>
                             </table>
@@ -100,12 +95,12 @@
                             <span>Rp {{ number_format($total ?? 0, 0, ',', '.') }}</span>
                         </div>
 
-                        <!-- TOMBOL CHECKOUT YANG SUDAH DIPERBAIKI -->
+                        <!-- TOMBOL CHECKOUT - INI YANG PALING PENTING -->
                         <div class="mt-10 flex justify-end">
                             <form action="{{ route('checkout.store') }}" method="POST">
                                 @csrf
                                 <button type="submit"
-                                    class="bg-green-600 hover:bg-green-700 text-white px-10 py-4 rounded-2xl text-lg font-semibold transition">
+                                        class="bg-green-600 hover:bg-green-700 text-white px-10 py-4 rounded-2xl text-lg font-semibold transition">
                                     🛒 Lanjut ke Checkout →
                                 </button>
                             </form>
