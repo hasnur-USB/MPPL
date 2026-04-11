@@ -13,6 +13,11 @@ class Cart extends Model
 
     protected $fillable = ['user_id', 'barang_id', 'qty'];
 
+    protected $casts = [
+        'qty' => 'integer',
+    ];
+
+    // Relasi
     public function user()
     {
         return $this->belongsTo(User::class);
