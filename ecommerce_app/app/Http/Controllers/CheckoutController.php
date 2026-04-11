@@ -15,7 +15,6 @@ class CheckoutController extends Controller
     {
         $userId = Auth::id();
 
-        // Ambil semua item di keranjang dari database
         $cartItems = Cart::with('barang')->where('user_id', $userId)->get();
 
         if ($cartItems->isEmpty()) {
@@ -25,38 +24,36 @@ class CheckoutController extends Controller
         DB::transaction(function () use ($cartItems, $userId) {
             $total = 0;
 
-            // 1. Buat Order baru
             $order = Order::create([
                 'user_id' => $userId,
-                'total_harga' => 0, // akan diupdate nanti
+                'total_harga' => 0,
                 'status' => 'pending',
             ]);
 
-            // 2. Simpan setiap item ke OrderItem + hitung total
             foreach ($cartItems as $cartItem) {
-                $subtotal = $cartItem->qty * $cartItem->barang->harga;
+                $subtotal = $cartItem->qty * ($cartItem->barang->harga ?? 0);
 
                 OrderItem::create([
                     'order_id' => $order->id,
                     'barang_id' => $cartItem->barang_id,
-                    'qty' => $cartItem->qty,
+                    'jumlah' => $cartItem->qty, // ← ini yang diperbaiki
                     'harga_saat_beli' => $cartItem->barang->harga,
                 ]);
 
                 $total += $subtotal;
 
                 // Kurangi stok barang
-                $cartItem->barang->decrement('stok', $cartItem->qty);
+                if ($cartItem->barang) {
+                    $cartItem->barang->decrement('stok', $cartItem->qty);
+                }
             }
 
-            // Update total harga di order
             $order->update(['total_harga' => $total]);
         });
 
-        // 3. Kosongkan keranjang (hapus semua cart item user)
+        // Kosongkan keranjang
         Cart::where('user_id', $userId)->delete();
 
-        // 4. Redirect ke halaman sukses atau riwayat
         return redirect()->route('riwayat.index')->with('success', 'Checkout berhasil! Pesanan Anda sedang diproses.');
     }
 }
