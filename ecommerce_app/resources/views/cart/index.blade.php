@@ -99,10 +99,13 @@
                         </div>
 
                         <div class="mt-10 flex justify-end">
-                            <a href="{{ route('checkout.store') }}"
-                                class="bg-green-600 hover:bg-green-700 text-white px-10 py-4 rounded-2xl text-lg font-semibold transition">
-                                Lanjut ke Checkout →
-                            </a>
+                            <form action="{{ route('checkout.store') }}" method="POST">
+                                @csrf
+                                <button type="submit"
+                                    class="bg-green-600 hover:bg-green-700 text-white px-10 py-4 rounded-2xl text-lg font-semibold transition">
+                                    🛒 Lanjut ke Checkout →
+                                </button>
+                            </form>
                         </div>
                     @endif
 
