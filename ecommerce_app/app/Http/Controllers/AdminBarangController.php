@@ -3,113 +3,87 @@
 namespace App\Http\Controllers;
 
 use App\Models\Barang;
+use App\Http\Requests\StoreBarangRequest;
+use App\Http\Requests\UpdateBarangRequest;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Http\Request;
 
 class AdminBarangController extends Controller
 {
-    // 1. Menampilkan daftar barang
+    /**
+     * Display a listing of the resource.
+     */
     public function index()
     {
-        $barangs = Barang::all();
+        $barangs = Barang::latest()->paginate(10); // tambah pagination biar rapi
         return view('admin.barang.index', compact('barangs'));
     }
 
-    // 2. Menampilkan form tambah barang
+    /**
+     * Show the form for creating a new resource.
+     */
     public function create()
     {
         return view('admin.barang.create');
     }
 
-    // 3. Menyimpan data barang baru ke database
-    public function store(Request $request)
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(StoreBarangRequest $request)
     {
-        // 1. Validasi data yang masuk, termasuk memastikan gambar sesuai format
-        $request->validate([
-            'nama_barang' => 'required|string|max:255',
-            'deskripsi' => 'required',
-            'harga' => 'required|numeric|min:0',
-            'stok' => 'required|integer|min:0',
-            'gambar' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-        ]);
+        $data = $request->validated();
 
-        // 2. Ambil semua data teks dari inputan
-        $input = $request->all();
-
-        // 3. Cek apakah ada file gambar yang diupload
         if ($request->hasFile('gambar')) {
-            // Simpan gambar ke folder: storage/app/public/barangs
-            // Dan simpan nama foldernya ('barangs/namafile.jpg') ke variabel $input['gambar']
             $path = $request->file('gambar')->store('barangs', 'public');
-            $input['gambar'] = $path;
+            $data['gambar'] = $path;
         }
 
-        // 4. Simpan ke database
-        Barang::create($input);
+        Barang::create($data);
 
-        // 5. Kembali ke halaman daftar barang dengan pesan sukses
-        return redirect()->route('admin.barang.index')->with('success', 'Barang berhasil ditambahkan beserta gambarnya!');
+        return redirect()->route('admin.barang.index')->with('success', 'Barang berhasil ditambahkan!');
     }
 
-    // 4. Menampilkan detail barang (opsional, bisa dilewati jika tidak butuh)
-    public function show(string $id)
-    {
-        //
-    }
-
-    // 5. Menampilkan form edit barang
+    /**
+     * Show the form for editing the specified resource.
+     */
     public function edit(Barang $barang)
     {
         return view('admin.barang.edit', compact('barang'));
     }
 
-    // 6. Memperbarui data barang di database
-    public function update(Request $request, string $id)
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(UpdateBarangRequest $request, Barang $barang)
     {
-        $barang = Barang::findOrFail($id);
+        $data = $request->validated();
 
-        $request->validate([
-            'nama_barang' => 'required|string|max:255',
-            'deskripsi' => 'required',
-            'harga' => 'required|numeric|min:0',
-            'stok' => 'required|integer|min:0',
-            'gambar' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-        ]);
-
-        $input = $request->all();
-
-        // Cek apakah Admin mengunggah gambar baru
         if ($request->hasFile('gambar')) {
-            // 1. Hapus gambar lama dari folder (jika barang tersebut punya gambar)
+            // Hapus gambar lama jika ada
             if ($barang->gambar) {
                 Storage::disk('public')->delete($barang->gambar);
             }
 
-            // 2. Simpan gambar baru
             $path = $request->file('gambar')->store('barangs', 'public');
-            $input['gambar'] = $path;
+            $data['gambar'] = $path;
         }
 
-        // Update data di database
-        $barang->update($input);
+        $barang->update($data);
 
         return redirect()->route('admin.barang.index')->with('success', 'Barang berhasil diupdate!');
     }
 
-    // 7. Menghapus data barang
-    public function destroy(string $id)
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(Barang $barang)
     {
-        $barang = Barang::findOrFail($id);
-
-        // 1. Hapus file gambar dari folder (jika barang tersebut punya gambar)
         if ($barang->gambar) {
             Storage::disk('public')->delete($barang->gambar);
         }
 
-        // 2. Hapus data barang dari database
         $barang->delete();
 
-        // 3. Kembali ke halaman daftar dengan pesan sukses
-        return redirect()->route('admin.barang.index')->with('success', 'Barang beserta gambarnya berhasil dihapus!');
+        return redirect()->route('admin.barang.index')->with('success', 'Barang berhasil dihapus!');
     }
 }
