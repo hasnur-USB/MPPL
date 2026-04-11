@@ -39,8 +39,8 @@
                     <div
                         class="bg-white border border-pink-100 rounded-3xl p-6 flex items-center gap-5 group hover:shadow-md transition-all">
 
-                        <!-- Checkbox -->
-                        <form action="{{ route('tasks.update', $task) }}" method="POST" class="inline">
+                        <!-- Checkbox Toggle Done -->
+                        <form action="{{ route('tasks.toggle', $task) }}" method="POST" class="inline">
                             @csrf
                             @method('PATCH')
                             <button type="submit" class="focus:outline-none">
@@ -54,23 +54,31 @@
                             {{ $task->title }}
                         </span>
 
-                        <!-- Delete Button -->
-                        <form action="{{ route('tasks.destroy', $task) }}" method="POST"
-                            onsubmit="return confirm('Yakin mau hapus task ini?')">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit"
-                                class="text-red-300 hover:text-red-500 opacity-60 hover:opacity-100 transition-all text-xl">
-                                🗑️
-                            </button>
-                        </form>
+                        <!-- Action Buttons -->
+                        <div class="flex items-center gap-4 opacity-70 group-hover:opacity-100 transition-all">
+                            <!-- Edit Button -->
+                            <a href="{{ route('tasks.edit', $task) }}"
+                                class="text-amber-400 hover:text-amber-500 text-2xl transition-all hover:scale-110">
+                                ✏️
+                            </a>
+
+                            <!-- Delete Button -->
+                            <form action="{{ route('tasks.destroy', $task) }}" method="POST"
+                                onsubmit="return confirm('Yakin mau hapus task ini?')">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="text-red-300 hover:text-red-500 text-2xl">
+                                    🗑️
+                                </button>
+                            </form>
+                        </div>
                     </div>
                 @endforeach
             @endif
         </div>
 
         @if (session('success'))
-            <div class="mt-6 bg-green-100 border border-green-300 text-green-700 px-6 py-4 rounded-3xl text-center">
+            <div class="mt-8 bg-green-100 border border-green-300 text-green-700 px-6 py-4 rounded-3xl text-center">
                 {{ session('success') }}
             </div>
         @endif

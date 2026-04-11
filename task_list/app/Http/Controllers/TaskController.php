@@ -30,7 +30,8 @@ class TaskController extends Controller
         return redirect()->route('dashboard')->with('success', 'Task berhasil ditambahkan 🥰');
     }
 
-    public function update(Request $request, Task $task)
+    // Toggle Done / Undone
+    public function toggleDone(Request $request, Task $task)
     {
         if ($task->user_id !== Auth::id()) {
             abort(403);
@@ -43,6 +44,34 @@ class TaskController extends Controller
         return redirect()->route('dashboard');
     }
 
+    // Tampilkan Form Edit Task
+    public function edit(Task $task)
+    {
+        if ($task->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        return view('tasks.edit', compact('task'));
+    }
+
+    // Simpan Perubahan Judul Task
+    public function updateTitle(Request $request, Task $task)
+    {
+        if ($task->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        $request->validate([
+            'title' => 'required|string|max:255',
+        ]);
+
+        $task->update([
+            'title' => $request->title,
+        ]);
+
+        return redirect()->route('dashboard')->with('success', 'Task berhasil diedit 🥰');
+    }
+
     public function destroy(Task $task)
     {
         if ($task->user_id !== Auth::id()) {
@@ -51,5 +80,13 @@ class TaskController extends Controller
 
         $task->delete();
         return redirect()->route('dashboard');
+    }
+
+    // Upcoming Tasks
+    public function upcoming()
+    {
+        $tasks = Task::where('user_id', Auth::id())->where('due_date', '>=', today())->orderBy('due_date')->orderBy('is_done')->get()->groupBy('due_date');
+
+        return view('tasks.upcoming', compact('tasks'));
     }
 }

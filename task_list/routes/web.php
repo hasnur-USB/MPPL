@@ -7,18 +7,28 @@ Route::get('/', function () {
     return redirect('/login');
 });
 
-// Semua route yang butuh login
 Route::middleware(['auth', 'verified'])->group(function () {
-    // Dashboard = Halaman Today's Tasks
+
+    // Dashboard = Today's Tasks
     Route::get('/dashboard', [TaskController::class, 'index'])->name('dashboard');
 
-    // CRUD Task
-    Route::post('/tasks', [TaskController::class, 'store'])->name('tasks.store');
-    Route::patch('/tasks/{task}', [TaskController::class, 'update'])->name('tasks.update');
+    // Task Routes
+    Route::post('/tasks', [TaskController::class, 'store'])->name('tasks.store');           // Tambah task
+    Route::patch('/tasks/{task}', [TaskController::class, 'toggleDone'])->name('tasks.toggle'); // Centang done/undone
+
+    // Edit Task (Form + Simpan)
+    Route::get('/tasks/{task}/edit', [TaskController::class, 'edit'])->name('tasks.edit');
+    Route::put('/tasks/{task}', [TaskController::class, 'updateTitle'])->name('tasks.updateTitle');
+
+    // Delete Task
     Route::delete('/tasks/{task}', [TaskController::class, 'destroy'])->name('tasks.destroy');
+
+    // Upcoming Page
+    Route::get('/upcoming', [TaskController::class, 'upcoming'])->name('upcoming');
+
 });
 
-// Route Profile dari Breeze (tetap dipertahankan)
+// Profile Breeze (tetap dipertahankan)
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [App\Http\Controllers\ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
