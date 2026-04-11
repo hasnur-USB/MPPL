@@ -13,10 +13,7 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-// ==========================================
-// PENGARAH LALU LINTAS (TRAFFIC CONTROLLER)
-// ==========================================
-// Menggantikan dashboard bawaan Breeze agar membagi rute berdasarkan role
+// Redirect /dashboard based on user role
 Route::get('/dashboard', function () {
     if (auth()->user()->role === 'admin') {
         return redirect()->route('admin.dashboard');
@@ -33,39 +30,27 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-// ==========================================
-// RUTE UNTUK CUSTOMER
-// ==========================================
+// Customer Routes
 Route::middleware(['auth', 'role:customer'])->group(function () {
-    // Halaman Katalog Utama
     Route::get('/katalog', [KatalogController::class, 'index'])->name('katalog.index');
 
-    // Rute Keranjang
+    // Cart
     Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
     Route::post('/cart/add/{id}', [CartController::class, 'add'])->name('cart.add');
+    Route::patch('/cart/update/{id}', [CartController::class, 'update'])->name('cart.update');
     Route::delete('/cart/remove/{id}', [CartController::class, 'remove'])->name('cart.remove');
 
-    // Rute Checkout
     Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
-    
-    // Rute Riwayat Pesanan
     Route::get('/riwayat', [RiwayatController::class, 'index'])->name('riwayat.index');
 });
 
-// ==========================================
-// RUTE UNTUK ADMIN
-// ==========================================
+// Admin Routes
 Route::middleware(['auth', 'role:admin'])
     ->prefix('admin')
     ->name('admin.')
     ->group(function () {
-        // Halaman Dashboard Admin
         Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
-
-        // Rute CRUD untuk mengelola barang
         Route::resource('barang', AdminBarangController::class);
-
-        // Rute untuk mengelola pesanan (SUDAH DIPERBAIKI)
         Route::get('/orders', [App\Http\Controllers\Admin\OrderController::class, 'index'])->name('orders.index');
         Route::get('/orders/{order}', [App\Http\Controllers\Admin\OrderController::class, 'show'])->name('orders.show');
         Route::patch('/orders/{order}/status', [App\Http\Controllers\Admin\OrderController::class, 'updateStatus'])->name('orders.updateStatus');

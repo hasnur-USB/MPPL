@@ -2,53 +2,69 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Cart;
 use App\Models\Barang;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class CartController extends Controller
 {
-    // Menampilkan isi keranjang
     public function index()
     {
-        $cart = session()->get('cart', []);
-        $total = 0;
-        foreach ($cart as $item) {
-            $total += $item['harga'] * $item['jumlah'];
-        }
+        $cartItems = Cart::with('barang')->where('user_id', Auth::id())->get();
 
-        return view('cart.index', compact('cart', 'total'));
+        $total = $cartItems->sum(function ($item) {
+            return $item->qty * $item->barang->harga;
+        });
+
+        return view('cart.index', compact('cartItems', 'total'));
     }
 
-    // Menambah barang ke keranjang
-    public function add($id)
+    public function add(Request $request)
     {
-        $barang = Barang::findOrFail($id);
-        $cart = session()->get('cart', []);
+        $request->validate([
+            'barang_id' => 'required|exists:barangs,id',
+            'qty' => 'required|integer|min:1',
+        ]);
 
-        if (isset($cart[$id])) {
-            $cart[$id]['jumlah']++;
-        } else {
-            $cart[$id] = [
-                'nama_barang' => $barang->nama_barang,
-                'harga' => $barang->harga,
-                'jumlah' => 1,
-                // TAMBAHKAN BARIS INI AGAR GAMBAR IKUT TERSIMPAN:
-                'gambar' => $barang->gambar,
-            ];
+        $barang = Barang::findOrFail($request->barang_id);
+
+        // Cek stok
+        if ($barang->stok < $request->qty) {
+            return redirect()->back()->with('error', 'Stok tidak cukup!');
         }
 
-        session()->put('cart', $cart);
-        return redirect()->back()->with('success', 'Barang berhasil ditambahkan ke keranjang!');
+        // Tambah atau update cart
+        Cart::updateOrCreate(
+            [
+                'user_id' => Auth::id(),
+                'barang_id' => $request->barang_id,
+            ],
+            [
+                'qty' => \DB::raw('qty + ' . $request->qty),
+            ],
+        );
+
+        return redirect()->route('cart.index')->with('success', 'Barang berhasil ditambahkan ke keranjang!');
     }
 
-    // Menghapus satu item dari keranjang
+    public function update(Request $request, $id)
+    {
+        $cartItem = Cart::where('user_id', Auth::id())->findOrFail($id);
+
+        if ($request->qty < 1) {
+            return redirect()->back()->with('error', 'Jumlah minimal 1');
+        }
+
+        $cartItem->update(['qty' => $request->qty]);
+
+        return redirect()->route('cart.index')->with('success', 'Keranjang berhasil diupdate');
+    }
+
     public function remove($id)
     {
-        $cart = session()->get('cart', []);
-        if (isset($cart[$id])) {
-            unset($cart[$id]);
-            session()->put('cart', $cart);
-        }
-        return redirect()->back()->with('success', 'Barang dihapus dari keranjang.');
+        Cart::where('user_id', Auth::id())->findOrFail($id)->delete();
+
+        return redirect()->route('cart.index')->with('success', 'Barang dihapus dari keranjang');
     }
 }
