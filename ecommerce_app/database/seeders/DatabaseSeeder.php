@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\User;
+use App\Models\Barang;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
@@ -25,5 +26,12 @@ class DatabaseSeeder extends Seeder
             'password' => Hash::make('password'),
             'role' => 'customer',
         ]);
+        // Buat 5 customer dummy
+        User::factory(5)->create(['role' => 'customer']);
+
+        // Buat 20 barang dummy
+        Barang::factory(20)->create();
+
+        $this->command->info('✅ Seeder selesai! Admin: admin@example.com | password: password');
     }
 }
