@@ -19,19 +19,20 @@ class TaskController extends Controller
     {
         $request->validate([
             'title' => 'required|string|max:255',
+            'due_date' => 'required|date|after_or_equal:today',
         ]);
 
         Task::create([
             'user_id' => Auth::id(),
             'title' => $request->title,
-            'due_date' => today(),
+            'due_date' => $request->due_date,
         ]);
 
         return redirect()->route('dashboard')->with('success', 'Task berhasil ditambahkan 🥰');
     }
 
     // Toggle Done / Undone
-    public function toggleDone(Request $request, Task $task)
+    public function toggleDone(Task $task)
     {
         if ($task->user_id !== Auth::id()) {
             abort(403);

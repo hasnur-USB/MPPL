@@ -7,21 +7,39 @@
             <h2 class="text-4xl font-bold text-pink-600 flex items-center gap-3">
                 📌 Today's Tasks 🐰
             </h2>
-            <p class="text-pink-400 font-medium">{{ now()->format('l, d F Y') }}</p>
+            <!-- Tanggal real-time -->
+            <p id="current-date" class="text-pink-400 font-medium"></p>
         </div>
 
-        <!-- Form Tambah Task -->
+        <!-- Form Tambah Task dengan Pilih Tanggal -->
         <div class="bg-white rounded-3xl p-8 shadow-sm mb-10 border border-pink-100">
             <form action="{{ route('tasks.store') }}" method="POST">
                 @csrf
-                <div class="flex gap-4">
-                    <input type="text" name="title"
-                        class="flex-1 border-2 border-pink-200 focus:border-pink-400 rounded-3xl px-6 py-5 text-lg focus:outline-none placeholder:text-pink-300"
-                        placeholder="Apa yang mau kamu kerjakan hari ini? 🥰" required>
-                    <button type="submit"
-                        class="bg-pink-500 hover:bg-pink-600 px-10 rounded-3xl text-white font-medium transition-all active:scale-95 shadow-md">
-                        Tambah ✨
-                    </button>
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
+
+                    <!-- Input Judul Task -->
+                    <div class="md:col-span-7">
+                        <input type="text" name="title"
+                            class="w-full border-2 border-pink-200 focus:border-pink-400 rounded-3xl px-6 py-5 text-lg focus:outline-none placeholder:text-pink-300"
+                            placeholder="Apa yang mau kamu kerjakan?" required>
+                    </div>
+
+                    <!-- Pilih Tanggal -->
+                    <div class="md:col-span-3">
+                        <label class="block text-pink-400 text-sm mb-2 font-medium">Tanggal</label>
+                        <input type="date" name="due_date" value="{{ now()->format('Y-m-d') }}"
+                            min="{{ now()->format('Y-m-d') }}"
+                            class="w-full border-2 border-pink-200 focus:border-pink-400 rounded-3xl px-6 py-5 text-lg focus:outline-none">
+                    </div>
+
+                    <!-- Tombol Tambah -->
+                    <div class="md:col-span-2">
+                        <button type="submit"
+                            class="w-full bg-pink-500 hover:bg-pink-600 h-[58px] rounded-3xl text-white font-medium transition-all active:scale-95 shadow-md">
+                            Tambah ✨
+                        </button>
+                    </div>
+
                 </div>
             </form>
         </div>
@@ -84,4 +102,27 @@
         @endif
 
     </div>
+
+    <!-- Script Tanggal Real-time -->
+    <script>
+        function updateCurrentDate() {
+            const dateElement = document.getElementById('current-date');
+            if (!dateElement) return;
+
+            const now = new Date();
+            const options = {
+                weekday: 'long',
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric'
+            };
+
+            const formattedDate = now.toLocaleDateString('id-ID', options);
+            dateElement.textContent = formattedDate;
+        }
+
+        updateCurrentDate();
+        setInterval(updateCurrentDate, 1800000); // update setiap 30 menit
+    </script>
+
 @endsection

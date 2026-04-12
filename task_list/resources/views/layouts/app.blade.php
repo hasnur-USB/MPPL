@@ -28,7 +28,7 @@
                     class="flex items-center gap-4 px-5 py-4 rounded-3xl bg-pink-100 text-pink-600 font-medium">
                     🏠 Today
                 </a>
-                <a href="#"
+                <a href="{{ route('upcoming') }}"
                     class="flex items-center gap-4 px-5 py-4 rounded-3xl hover:bg-pink-100 transition-all text-gray-600 hover:text-pink-600">
                     📅 Upcoming
                 </a>
@@ -45,11 +45,25 @@
             <!-- Bagian User -->
             <div class="p-6 border-t border-pink-100 mt-auto">
                 <div class="flex items-center gap-3 bg-pink-50 rounded-3xl p-4">
-                    <div class="w-10 h-10 bg-pink-300 rounded-2xl flex items-center justify-center text-2xl">🥰</div>
-                    <div class="flex-1 min-w-0">
-                        <p class="font-medium text-pink-700 truncate">{{ Auth::user()->name }}</p>
-                        <p class="text-xs text-pink-400">Semangat hari ini beb! ✨</p>
+                    <!-- Avatar -->
+                    <div
+                        class="w-11 h-11 bg-pink-200 rounded-2xl overflow-hidden border-2 border-pink-300 flex-shrink-0">
+                        @if (Auth::user()->avatar)
+                            <img src="{{ asset('storage/' . Auth::user()->avatar) }}" alt="Avatar"
+                                class="w-full h-full object-cover">
+                        @else
+                            <div class="w-full h-full flex items-center justify-center text-3xl">🥰</div>
+                        @endif
                     </div>
+
+                    <div class="flex-1 min-w-0">
+                        <a href="{{ route('profile.edit') }}"
+                            class="font-medium text-pink-700 truncate hover:text-pink-600 transition-colors">
+                            {{ Auth::user()->name }}
+                        </a>
+                        <p class="text-xs text-pink-400">Semangat hari ini ! ✨</p>
+                    </div>
+
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
                         <button type="submit" class="text-pink-400 hover:text-red-500 text-sm font-medium">
@@ -68,6 +82,32 @@
         </div>
 
     </div>
+
+    <!-- Script Tanggal Real-time -->
+    <script>
+        function updateCurrentDate() {
+            const dateElement = document.getElementById('current-date');
+            if (!dateElement) return;
+
+            const now = new Date();
+            const options = {
+                weekday: 'long',
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric'
+            };
+
+            // Format bahasa Indonesia
+            const formatted = now.toLocaleDateString('id-ID', options);
+            dateElement.textContent = formatted;
+        }
+
+        // Jalankan saat halaman load
+        window.onload = updateCurrentDate;
+
+        // Update setiap 30 menit sekali 
+        setInterval(updateCurrentDate, 1800000);
+    </script>
 
 </body>
 
