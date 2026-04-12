@@ -8,14 +8,86 @@ use Illuminate\Support\Facades\Auth;
 
 class TaskController extends Controller
 {
+    //TODAY
     public function index()
     {
-        $tasks = Task::where('user_id', Auth::id())->where('due_date', today())->orderBy('is_done')->orderBy('created_at', 'desc')->get();
+        $tasks = Task::where('user_id', Auth::id())
+            ->whereNull('due_date') 
+            ->orderBy('is_done')
+            ->orderBy('created_at', 'desc')
+            ->get();
 
         return view('dashboard', compact('tasks'));
     }
 
     public function store(Request $request)
+    {
+        $request->validate([
+            'title' => 'required|string|max:255',
+        ]);
+
+        Task::create([
+            'user_id' => Auth::id(),
+            'title' => $request->title,
+            'due_date' => null, 
+        ]);
+
+        return redirect()->route('dashboard')->with('success', 'Task berhasil ditambahkan 🥰');
+    }
+
+    // TOGGLE DONE
+    public function toggleDone(Task $task)
+    {
+        if ($task->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        $task->update(['is_done' => !$task->is_done]);
+
+        return redirect()->back();
+    }
+
+    // EDIT TITLE
+    public function edit(Task $task)
+    {
+        if ($task->user_id !== Auth::id()) {
+            abort(403);
+        }
+        return view('tasks.edit', compact('task'));
+    }
+
+    public function updateTitle(Request $request, Task $task)
+    {
+        if ($task->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        $request->validate(['title' => 'required|string|max:255']);
+
+        $task->update(['title' => $request->title]);
+
+        return redirect()->route('dashboard')->with('success', 'Task berhasil diedit 🥰');
+    }
+
+    public function destroy(Task $task)
+    {
+        if ($task->user_id !== Auth::id()) {
+            abort(403);
+        }
+        $task->delete();
+        return redirect()->back();
+    }
+
+    // UPCOMING:
+    public function upcoming()
+    {
+        $tasks = Task::where('user_id', Auth::id())->whereNotNull('due_date')->orderBy('due_date')->orderBy('is_done')->get()->groupBy('due_date');
+
+        return view('tasks.upcoming', compact('tasks'));
+    }
+
+    // Store dari Upcoming 
+    public function storeScheduled(Request $request)
     {
         $request->validate([
             'title' => 'required|string|max:255',
@@ -28,66 +100,6 @@ class TaskController extends Controller
             'due_date' => $request->due_date,
         ]);
 
-        return redirect()->route('dashboard')->with('success', 'Task berhasil ditambahkan 🥰');
-    }
-
-    // Toggle Done / Undone
-    public function toggleDone(Task $task)
-    {
-        if ($task->user_id !== Auth::id()) {
-            abort(403);
-        }
-
-        $task->update([
-            'is_done' => !$task->is_done,
-        ]);
-
-        return redirect()->route('dashboard');
-    }
-
-    // Tampilkan Form Edit Task
-    public function edit(Task $task)
-    {
-        if ($task->user_id !== Auth::id()) {
-            abort(403);
-        }
-
-        return view('tasks.edit', compact('task'));
-    }
-
-    // Simpan Perubahan Judul Task
-    public function updateTitle(Request $request, Task $task)
-    {
-        if ($task->user_id !== Auth::id()) {
-            abort(403);
-        }
-
-        $request->validate([
-            'title' => 'required|string|max:255',
-        ]);
-
-        $task->update([
-            'title' => $request->title,
-        ]);
-
-        return redirect()->route('dashboard')->with('success', 'Task berhasil diedit 🥰');
-    }
-
-    public function destroy(Task $task)
-    {
-        if ($task->user_id !== Auth::id()) {
-            abort(403);
-        }
-
-        $task->delete();
-        return redirect()->route('dashboard');
-    }
-
-    // Upcoming Tasks
-    public function upcoming()
-    {
-        $tasks = Task::where('user_id', Auth::id())->where('due_date', '>=', today())->orderBy('due_date')->orderBy('is_done')->get()->groupBy('due_date');
-
-        return view('tasks.upcoming', compact('tasks'));
+        return redirect()->route('upcoming')->with('success', 'Task terjadwal berhasil ditambahkan 📅');
     }
 }

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\TaskController;
+use App\Http\Controllers\DiaryController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -8,24 +9,24 @@ Route::get('/', function () {
 });
 
 Route::middleware(['auth', 'verified'])->group(function () {
-
-    // Dashboard = Today's Tasks
     Route::get('/dashboard', [TaskController::class, 'index'])->name('dashboard');
 
-    // Task Routes
-    Route::post('/tasks', [TaskController::class, 'store'])->name('tasks.store');           // Tambah task
-    Route::patch('/tasks/{task}', [TaskController::class, 'toggleDone'])->name('tasks.toggle'); // Centang done/undone
+    // Today Routes
+    Route::post('/tasks', [TaskController::class, 'store'])->name('tasks.store');
 
-    // Edit Task (Form + Simpan)
+    // Upcoming Routes
+    Route::get('/upcoming', [TaskController::class, 'upcoming'])->name('upcoming');
+    Route::post('/tasks/scheduled', [TaskController::class, 'storeScheduled'])->name('tasks.storeScheduled');
+
+    // Common Routes
+    Route::patch('/tasks/{task}', [TaskController::class, 'toggleDone'])->name('tasks.toggle');
     Route::get('/tasks/{task}/edit', [TaskController::class, 'edit'])->name('tasks.edit');
     Route::put('/tasks/{task}', [TaskController::class, 'updateTitle'])->name('tasks.updateTitle');
-
-    // Delete Task
     Route::delete('/tasks/{task}', [TaskController::class, 'destroy'])->name('tasks.destroy');
 
-    // Upcoming Page
-    Route::get('/upcoming', [TaskController::class, 'upcoming'])->name('upcoming');
-
+    // Diary Routes
+    Route::get('/diary', [DiaryController::class, 'index'])->name('diary.index');
+    Route::post('/diary', [DiaryController::class, 'store'])->name('diary.store');
 });
 
 // Profile Breeze (tetap dipertahankan)

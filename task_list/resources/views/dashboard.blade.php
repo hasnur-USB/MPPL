@@ -7,39 +7,21 @@
             <h2 class="text-4xl font-bold text-pink-600 flex items-center gap-3">
                 📌 Today's Tasks 🐰
             </h2>
-            <!-- Tanggal real-time -->
             <p id="current-date" class="text-pink-400 font-medium"></p>
         </div>
 
-        <!-- Form Tambah Task dengan Pilih Tanggal -->
+        <!-- Form Tambah Task (Tanpa Tanggal) -->
         <div class="bg-white rounded-3xl p-8 shadow-sm mb-10 border border-pink-100">
             <form action="{{ route('tasks.store') }}" method="POST">
                 @csrf
-                <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
-
-                    <!-- Input Judul Task -->
-                    <div class="md:col-span-7">
-                        <input type="text" name="title"
-                            class="w-full border-2 border-pink-200 focus:border-pink-400 rounded-3xl px-6 py-5 text-lg focus:outline-none placeholder:text-pink-300"
-                            placeholder="Apa yang mau kamu kerjakan?" required>
-                    </div>
-
-                    <!-- Pilih Tanggal -->
-                    <div class="md:col-span-3">
-                        <label class="block text-pink-400 text-sm mb-2 font-medium">Tanggal</label>
-                        <input type="date" name="due_date" value="{{ now()->format('Y-m-d') }}"
-                            min="{{ now()->format('Y-m-d') }}"
-                            class="w-full border-2 border-pink-200 focus:border-pink-400 rounded-3xl px-6 py-5 text-lg focus:outline-none">
-                    </div>
-
-                    <!-- Tombol Tambah -->
-                    <div class="md:col-span-2">
-                        <button type="submit"
-                            class="w-full bg-pink-500 hover:bg-pink-600 h-[58px] rounded-3xl text-white font-medium transition-all active:scale-95 shadow-md">
-                            Tambah ✨
-                        </button>
-                    </div>
-
+                <div class="flex gap-4">
+                    <input type="text" name="title"
+                        class="flex-1 border-2 border-pink-200 focus:border-pink-400 rounded-3xl px-6 py-5 text-lg focus:outline-none placeholder:text-pink-300"
+                        placeholder="Apa yang mau kamu kerjakan hari ini? 🥰" required>
+                    <button type="submit"
+                        class="bg-pink-500 hover:bg-pink-600 px-10 rounded-3xl text-white font-medium transition-all active:scale-95 shadow-md">
+                        Tambah ✨
+                    </button>
                 </div>
             </form>
         </div>
@@ -57,7 +39,7 @@
                     <div
                         class="bg-white border border-pink-100 rounded-3xl p-6 flex items-center gap-5 group hover:shadow-md transition-all">
 
-                        <!-- Checkbox Toggle Done -->
+                        <!-- Checkbox -->
                         <form action="{{ route('tasks.toggle', $task) }}" method="POST" class="inline">
                             @csrf
                             @method('PATCH')
@@ -74,13 +56,11 @@
 
                         <!-- Action Buttons -->
                         <div class="flex items-center gap-4 opacity-70 group-hover:opacity-100 transition-all">
-                            <!-- Edit Button -->
                             <a href="{{ route('tasks.edit', $task) }}"
                                 class="text-amber-400 hover:text-amber-500 text-2xl transition-all hover:scale-110">
                                 ✏️
                             </a>
 
-                            <!-- Delete Button -->
                             <form action="{{ route('tasks.destroy', $task) }}" method="POST"
                                 onsubmit="return confirm('Yakin mau hapus task ini?')">
                                 @csrf
@@ -116,13 +96,11 @@
                 month: 'long',
                 year: 'numeric'
             };
-
-            const formattedDate = now.toLocaleDateString('id-ID', options);
-            dateElement.textContent = formattedDate;
+            dateElement.textContent = now.toLocaleDateString('id-ID', options);
         }
 
         updateCurrentDate();
-        setInterval(updateCurrentDate, 1800000); // update setiap 30 menit
+        setInterval(updateCurrentDate, 1800000);
     </script>
 
 @endsection

@@ -24,20 +24,36 @@
             </div>
 
             <nav class="flex-1 p-6 space-y-2">
+                <!-- Today -->
                 <a href="{{ route('dashboard') }}"
-                    class="flex items-center gap-4 px-5 py-4 rounded-3xl bg-pink-100 text-pink-600 font-medium">
+                    class="flex items-center gap-4 px-5 py-4 rounded-3xl transition-all font-medium
+                {{ request()->routeIs('dashboard') ? 'bg-pink-100 text-pink-600' : 'hover:bg-pink-100 text-gray-600 hover:text-pink-600' }}">
                     🏠 Today
                 </a>
+
+                <!-- Upcoming -->
                 <a href="{{ route('upcoming') }}"
-                    class="flex items-center gap-4 px-5 py-4 rounded-3xl hover:bg-pink-100 transition-all text-gray-600 hover:text-pink-600">
+                    class="flex items-center gap-4 px-5 py-4 rounded-3xl transition-all font-medium
+                {{ request()->routeIs('upcoming') ? 'bg-pink-100 text-pink-600' : 'hover:bg-pink-100 text-gray-600 hover:text-pink-600' }}">
                     📅 Upcoming
                 </a>
+
+                <!-- Diary -->
+                <a href="{{ route('diary.index') }}"
+                    class="flex items-center gap-4 px-5 py-4 rounded-3xl transition-all font-medium
+                {{ request()->routeIs('diary.index') ? 'bg-pink-100 text-pink-600' : 'hover:bg-pink-100 text-gray-600 hover:text-pink-600' }}">
+                    📔 My Diary
+                </a>
+
+                <!-- Habits  -->
                 <a href="#"
-                    class="flex items-center gap-4 px-5 py-4 rounded-3xl hover:bg-pink-100 transition-all text-gray-600 hover:text-pink-600">
+                    class="flex items-center gap-4 px-5 py-4 rounded-3xl hover:bg-pink-100 transition-all text-gray-600 hover:text-pink-600 font-medium">
                     🌱 Habits
                 </a>
+
+                <!-- Stats -->
                 <a href="#"
-                    class="flex items-center gap-4 px-5 py-4 rounded-3xl hover:bg-pink-100 transition-all text-gray-600 hover:text-pink-600">
+                    class="flex items-center gap-4 px-5 py-4 rounded-3xl hover:bg-pink-100 transition-all text-gray-600 hover:text-pink-600 font-medium">
                     📊 Stats
                 </a>
             </nav>
