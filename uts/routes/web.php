@@ -1,31 +1,20 @@
 <?php
 
-use App\Http\Controllers\AdminController;
-use App\Http\Controllers\RegistrationController;
+use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
-// ==================== ROUTE UMUM ====================
 Route::get('/', function () {
     return view('welcome');
-})->name('home');
+});
 
-// ==================== ROUTE PESERTA ====================
-Route::get('/daftar', [RegistrationController::class, 'create'])->name('daftar');
-Route::post('/daftar', [RegistrationController::class, 'store']);
+Route::get('/dashboard', function () {
+    return view('dashboard');
+})->middleware(['auth', 'verified'])->name('dashboard');
 
-Route::get('/status', [RegistrationController::class, 'status'])->name('status');
-Route::post('/status', [RegistrationController::class, 'checkStatus']);
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
 
-// ==================== ROUTE ADMIN (LOGIN BREEZE) ====================
-Route::middleware('auth')
-    ->prefix('admin')
-    ->name('admin.')
-    ->group(function () {
-        Route::get('/dashboard', [AdminController::class, 'index'])->name('dashboard');
-        Route::post('/approve/{id}', [AdminController::class, 'approve'])->name('approve');
-        Route::post('/reject/{id}', [AdminController::class, 'reject'])->name('reject');
-        Route::delete('/registration/{id}', [AdminController::class, 'destroy'])->name('delete');
-    });
-
-// ==================== ROUTE AUTH DARI BREEZE ====================
-require __DIR__ . '/auth.php';
+require __DIR__.'/auth.php';
